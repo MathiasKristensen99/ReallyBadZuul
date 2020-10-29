@@ -34,7 +34,7 @@ public class Game
      */
     private void createRooms()
     {
-        Room outside, theater, pub, lab, office;
+        Room outside, theater, pub, lab, office, dungeon;
       
         // create the rooms
         outside = new Room("outside the main entrance of the university");
@@ -42,6 +42,7 @@ public class Game
         pub = new Room("in the campus pub");
         lab = new Room("in a computing lab");
         office = new Room("in the computing admin office");
+        dungeon = new Room("In the deep place beneath the building");
         
         // initialise room exits
         outside.setExits(null, theater, lab, pub);
@@ -49,6 +50,7 @@ public class Game
         pub.setExits(null, outside, null, null);
         lab.setExits(outside, office, null, null);
         office.setExits(null, null, null, lab);
+        dungeon.setExits(null, office,null, null);
 
         currentRoom = outside;  // start game outside
     }
@@ -81,6 +83,13 @@ public class Game
         System.out.println("World of Zuul is a new, incredibly boring adventure game.");
         System.out.println("Type 'help' if you need help.");
         System.out.println();
+        System.out.println("You are " + currentRoom.getDescription());
+        System.out.print("Exits: ");
+
+        printLocationInfo();
+    }
+
+    private void printLocationInfo() {
         System.out.println("You are " + currentRoom.getDescription());
         System.out.print("Exits: ");
         if(currentRoom.northExit != null) {
@@ -175,22 +184,7 @@ public class Game
             System.out.println("There is no door!");
         }
         else {
-            currentRoom = nextRoom;
-            System.out.println("You are " + currentRoom.getDescription());
-            System.out.print("Exits: ");
-            if(currentRoom.northExit != null) {
-                System.out.print("north ");
-            }
-            if(currentRoom.eastExit != null) {
-                System.out.print("east ");
-            }
-            if(currentRoom.southExit != null) {
-                System.out.print("south ");
-            }
-            if(currentRoom.westExit != null) {
-                System.out.print("west ");
-            }
-            System.out.println();
+            printLocationInfo();
         }
     }
 
