@@ -42,15 +42,27 @@ public class Game
         pub = new Room("in the campus pub");
         lab = new Room("in a computing lab");
         office = new Room("in the computing admin office");
-        dungeon = new Room("In the deep place beneath the building");
+
         
         // initialise room exits
-        outside.setExits(null, theater, lab, pub);
-        theater.setExits(null, null, null, outside);
-        pub.setExits(null, outside, null, null);
-        lab.setExits(outside, office, null, null);
-        office.setExits(null, null, null, lab);
-        dungeon.setExits(null, office,null, null);
+        outside.setExit("east", theater);
+        outside.setExit("south", lab);
+        outside.setExit("west", pub);
+        //outside.setExits(null, theater, lab, pub);
+
+        theater.setExit("west", outside);
+        //theater.setExits(null, null, null, outside);
+
+        pub.setExit("east", outside);
+        //pub.setExits(null, outside, null, null);
+
+        lab.setExit("north", outside);
+        lab.setExit("east", office);
+        //lab.setExits(outside, office, null, null);
+
+        office.setExit("west", lab);
+        //office.setExits(null, null, null, lab);
+
 
         currentRoom = outside;  // start game outside
     }
@@ -83,28 +95,15 @@ public class Game
         System.out.println("World of Zuul is a new, incredibly boring adventure game.");
         System.out.println("Type 'help' if you need help.");
         System.out.println();
-        System.out.println("You are " + currentRoom.getDescription());
-        System.out.print("Exits: ");
 
         printLocationInfo();
     }
 
     private void printLocationInfo() {
-        System.out.println("You are " + currentRoom.getDescription());
-        System.out.print("Exits: ");
-        if(currentRoom.northExit != null) {
-            System.out.print("north ");
-        }
-        if(currentRoom.eastExit != null) {
-            System.out.print("east ");
-        }
-        if(currentRoom.southExit != null) {
-            System.out.print("south ");
-        }
-        if(currentRoom.westExit != null) {
-            System.out.print("west ");
-        }
+        System.out.println(currentRoom.getLongDescription());
+        //System.out.print(currentRoom.getExitString());
         System.out.println();
+
     }
 
     /**
@@ -128,6 +127,9 @@ public class Game
         else if (commandWord.equals("go")) {
             goRoom(command);
         }
+        else if (commandWord.equals("look")) {
+            System.out.println(currentRoom.getLongDescription());
+        }
         else if (commandWord.equals("quit")) {
             wantToQuit = quit(command);
         }
@@ -149,6 +151,7 @@ public class Game
         System.out.println();
         System.out.println("Your command words are:");
         System.out.println("   go quit help");
+        //System.out.println(currentRoom.getLongDescription());
     }
 
     /** 
@@ -159,32 +162,19 @@ public class Game
     {
         if(!command.hasSecondWord()) {
             // if there is no second word, we don't know where to go...
-            System.out.println("Go where?");
-            return;
+            throw new IllegalArgumentException("Go where?");
         }
 
         String direction = command.getSecondWord();
 
         // Try to leave current room.
-        Room nextRoom = null;
-        if(direction.equals("north")) {
-            nextRoom = currentRoom.northExit;
-        }
-        if(direction.equals("east")) {
-            nextRoom = currentRoom.eastExit;
-        }
-        if(direction.equals("south")) {
-            nextRoom = currentRoom.southExit;
-        }
-        if(direction.equals("west")) {
-            nextRoom = currentRoom.westExit;
-        }
+        Room nextRoom = currentRoom.getExit(direction);
 
         if (nextRoom == null) {
-            System.out.println("There is no door!");
-        }
+            throw new IllegalArgumentException(direction + " is not a valid exit.");
+            }
         else {
-            printLocationInfo();
+            currentRoom = nextRoom;
         }
     }
 
